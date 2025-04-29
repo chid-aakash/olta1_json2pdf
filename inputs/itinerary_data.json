@@ -1,0 +1,75 @@
+{
+  "page1_config": {
+    "page_size_px": [2480, 3508],
+    "dpi": 300,
+    "paths": {
+      "input_dir": "inputs",
+      "output_dir": "outputs",
+      "logo": "inputs/sena_logo_transparent.png",
+      "title_font": "fonts/papyrus.ttf",
+      "text_font": "/System/Library/Fonts/Optima.ttc" 
+    },
+    "text_content": { 
+      "title1": "DEFAULT TITLE 1", 
+      "title2": "DEFAULT TITLE 2",
+      "dates": "DEFAULT DATES",
+      "prep": "Prepared for  ",
+      "name": "Default Name"
+    },
+    "fonts": {
+      "title_size": 220,
+      "dates_size": 85,
+      "prep_size": 85,
+      "name_size": 150
+    },
+    "layout": {
+      "text_start_y": 200,
+      "padding_title_lines": 80,
+      "padding_below_title": 180,
+      "padding_below_dates": 180,
+      "padding_below_prep_name": 100,
+      "prep_name_manual_v_offset": 65,
+      "prep_name_y": 3000
+    },
+    "styles": {
+      "logo_width": 200,
+      "logo_opacity": 0.70,
+      "overlay_color": [0, 0, 0, 80],
+      "text_fill": "white",
+      "text_shadow_color": "grey",
+      "text_shadow_offset": [3, 3],
+      "jpeg_quality": 95
+    }
+  },
+  "daywise_config": {
+    "PAGE_W": 2480,
+    "PAGE_H": 3508,
+    "PANEL_W": 1240, 
+    "PAGE_BG_COLOR": [246, 235, 215],
+    "CONTENT_TOP_MARGIN": 2087, 
+    "OUT_DIR_NAME": "outputs", 
+    "INPUTS_DIR_NAME": "inputs",
+    "FONTS_DIR_NAME": "fonts",
+    "font_paths": {
+        "PAPYRUS": "fonts/papyrus.ttf",
+        "BUNGEE": "fonts/Bungee-Regular.ttf",
+        "CHALKBOARD": "fonts/Chalkboard-Regular.ttf",
+        "CORE_NARE": "fonts/Core Narae Pro W01 Pro Bold.ttf",
+        "TIMES": "fonts/times.ttf",
+        "SUBTITLE": "fonts/times.ttf" 
+    },
+    "GAP_WIDTH": 40,
+    "JAG_AMPLITUDE": 10,
+    "SEGMENT_LENGTH": 20,
+    "HERO_OVERLAY_TEXT_COLOR": [246, 235, 215, 220],
+    "HEADLINE_NUM_LINES": 3,
+    "HEADLINE_LINE_SPACING_RATIO": 1.2,
+    "TIMELINE_PAGE_MARGIN": 50,
+    "BOTTOM_MARGIN": 20,
+    "TIMELINE_TEXT_COLOR": [255, 255, 255],
+    "ACTIVITY_TIME_COLOR": [220, 220, 220],
+    "ACTIVITY_SUBTITLE_COLOR": [235, 230, 220],
+    "OUTPUT_QUALITY": 95,
+    "OUTPUT_DPI": [300, 300]
+  }
+} 

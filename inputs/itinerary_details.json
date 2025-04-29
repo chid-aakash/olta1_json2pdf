@@ -1,0 +1,136 @@
+{
+  "itinerary_details": {
+    "page1_hero": "beach background.png", 
+    "page1_text": {
+      "title1": "BALI  BLISS",
+      "title2": "GETAWAY",
+      "dates": "15 - 18 June 2025",
+      "prep": "Specially Prepared for ",
+      "name": "Mr. Alex Johnson"
+    },
+    "days": [
+      {
+        "day": 1,
+        "title": "Arrival & Sunset at Uluwatu",
+        "hero_image": "day1_hero.png", 
+        "schedule": [
+          {"time": "14:00", "activity": "Arrive DPS - private transfer", "subtitle": "Smooth airport pickup and ride"},
+          {"time": "16:00", "activity": "Hotel check-in", "subtitle": "Settle into your cliffside retreat"},
+          {"time": "17:00", "activity": "Uluwatu Temple & Kecak dance", "subtitle": "Ancient temple, dramatic fire dance"},
+          {"time": "19:00", "activity": "Cliffside views", "subtitle": "Spectacular sunset panorama"},
+          {"time": "20:30", "activity": "Seafood dinner at Jimbaran Bay", "subtitle": "Fresh catch on the beach"}
+        ]
+      },
+      {
+        "day": 2,
+        "title": "Ubud Culture & Rice Terraces",
+        "hero_image": "day2_hero.jpeg", 
+        "schedule": [
+          {"time": "09:00", "activity": "Tegenungan Waterfall stop", "subtitle": "Refreshing morning cascade"},
+          {"time": "10:30", "activity": "Bali Swing & coffee tasting", "subtitle": "Soar high & sample local brews"},
+          {"time": "12:30", "activity": "Tegalalang rice-terrace walk & lunch", "subtitle": "Iconic paddies, scenic meal"},
+          {"time": "14:30", "activity": "Monkey Forest visit", "subtitle": "Playful primates in sacred grounds"},
+          {"time": "17:00", "activity": "Spa treatment", "subtitle": "Traditional Balinese relaxation"}
+        ]
+      },
+      {
+        "day": 3,
+        "title": "Northern Highlands & Temples",
+        "hero_image": "day3_hero.png", 
+        "schedule": [
+          {"time": "09:00", "activity": "Jatiluwih Rice Terraces (UNESCO)", "subtitle": "Panoramic views of vast paddies"},
+          {"time": "11:30", "activity": "Ulun Danu Beratan Temple", "subtitle": "Picturesque temple on the lake"},
+          {"time": "13:00", "activity": "Lunch near Lake Beratan", "subtitle": "Enjoy the cool mountain air"},
+          {"time": "15:00", "activity": "Gitgit Waterfall", "subtitle": "Trek to a refreshing cascade"},
+          {"time": "17:00", "activity": "Return towards South/Ubud", "subtitle": "Scenic drive back"}
+        ]
+      },
+      {
+        "day": 4,
+        "title": "East Bali Adventures",
+        "hero_image": "day4_hero.jpg", 
+        "schedule": [
+          {"time": "08:30", "activity": "Lempuyang Temple (Gate of Heaven)", "subtitle": "Iconic photo spot (early start recommended)"},
+          {"time": "11:00", "activity": "Tirta Gangga Water Palace", "subtitle": "Walk amongst serene pools and fountains"},
+          {"time": "13:00", "activity": "Lunch in Amlapura area", "subtitle": "Relaxing midday break"},
+          {"time": "14:30", "activity": "Taman Ujung Water Palace", "subtitle": "Historic royal water gardens"},
+          {"time": "16:30", "activity": "Virgin Beach (Pasir Putih)", "subtitle": "Relax on a less crowded beach"}
+        ]
+      },
+      {
+        "day": 5,
+        "title": "Island Hopping & Snorkeling",
+        "hero_image": "day5_hero.jpeg", 
+        "schedule": [
+          {"time": "08:00", "activity": "Transfer to Sanur & Fast Boat", "subtitle": "Head to Nusa Penida or Lembongan"},
+          {"time": "09:30", "activity": "Snorkeling at Manta Point/Crystal Bay", "subtitle": "Search for majestic manta rays"},
+          {"time": "12:30", "activity": "Lunch on the Island", "subtitle": "Fresh seafood or local fare"},
+          {"time": "14:00", "activity": "Explore Island Viewpoints", "subtitle": "Kelingking Beach or Devil's Tear"},
+          {"time": "16:00", "activity": "Return Fast Boat to Sanur", "subtitle": "Journey back to the mainland"}
+        ]
+      },
+      {
+        "day": 6,
+        "title": "Beach Relaxation & Departure",
+        "hero_image": "day6_hero.png", 
+        "schedule": [
+          {"time": "09:00", "activity": "Leisurely Breakfast & Morning Swim", "subtitle": "Enjoy your final morning"},
+          {"time": "11:00", "activity": "Optional: Last Minute Souvenirs", "subtitle": "Shopping in Seminyak or Kuta"},
+          {"time": "13:00", "activity": "Lunch at a Beach Club", "subtitle": "Soak up the sun and atmosphere"},
+          {"time": "15:00", "activity": "Transfer to DPS Airport", "subtitle": "Allow ample time for departure"},
+          {"time": "17:00", "activity": "Depart Bali", "subtitle": "Safe travels home!"}
+        ]
+      }
+    ],
+    "inclusions": [
+      "Round trip International Flights (Economy Class)",
+      "Accommodation for 6 nights in specified hotels (Double Occupancy)",
+      "Daily breakfast at the hotel",
+      "All transfers via private AC vehicle as per itinerary",
+      "Sightseeing tours and entrance fees as mentioned",
+      "English speaking guide during tours",
+      "Fast boat tickets for island hopping (if applicable)",
+      "Applicable taxes"
+    ],
+    "exclusions": [
+      "Visa fees for Indonesia (if applicable)",
+      "Lunches, dinners, and beverages unless specified",
+      "Personal expenses (laundry, phone calls, tips, etc.)",
+      "Travel Insurance (highly recommended)",
+      "Optional activities or excursions not mentioned",
+      "Early check-in or late check-out charges",
+      "Anything not explicitly mentioned in the 'Inclusions' section"
+    ],
+    "hotel_details": [
+      {
+        "name": "The Mulia Resort",
+        "stars": 5,
+        "short_address": "Sawangan, Bali",
+        "phone_number": "361 3017777",
+        "email_id": "info.nusadua@themulia.com",
+        "check_in_time": "15th June 3pm",
+        "check_out_time": "18th June 12pm",
+        "amenities": ["Oceanfront Pools", "Spa", "Fitness Center", "Multiple Restaurants", "Beach Access"]
+      }
+    ],
+    "quote": {
+      "amount": "2500",
+      "currency": "USD",
+      "details": "Based on double occupancy, inclusions as listed.",
+      "total_cost_per_person": "2500",
+      "payment_terms": {
+        "deposit": "30% deposit required upon confirmation.",
+        "balance_payment_time": "Balance payment due 60 days prior to departure."
+      }
+    },
+    "terms_and_conditions": [
+      "Prices are quoted per person in USD and are subject to change without prior notice.",
+      "Booking is subject to availability of hotels and flights.",
+      "Cancellation policy: [Specify your cancellation terms here, e.g., Deposit non-refundable, 50% charge if cancelled 60-31 days prior, 100% charge if cancelled within 30 days].",
+      "Travel insurance is strongly recommended.",
+      "We act only as agents for the suppliers and are not liable for any loss, injury, or damage.",
+      "Passport must be valid for at least 6 months beyond the return date.",
+      "Visa requirements are the responsibility of the traveler."
+    ]
+  }
+} 
