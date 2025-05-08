@@ -1,2 +1,5 @@
 numpy==2.2.5
 pillow==11.2.1
+fastapi
+uvicorn[standard]
+reportlab

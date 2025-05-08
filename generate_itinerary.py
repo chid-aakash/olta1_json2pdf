@@ -3,6 +3,7 @@ import os
 import sys
 from PIL import Image, ImageDraw, ImageFont
 import glob
+import argparse
 
 INPUT_JSON_PATH = "inputs/itinerary_data.json"
 INPUT_DETAILS_PATH = "inputs/itinerary_details.json"
@@ -88,16 +89,37 @@ INCEXC_BG_PATH = os.path.join(script_dir, 'inputs', 'incexc_bg.jpg') # Backgroun
 OUTPUTS_BASE_DIR = "outputs"
 
 def main():
+    parser = argparse.ArgumentParser(description="Generate an itinerary PDF from JSON input files.")
+    parser.add_argument(
+        'config_file', 
+        nargs='?', 
+        default=INPUT_JSON_PATH,
+        help=f"Path to the configuration JSON file. Defaults to '{INPUT_JSON_PATH}'"
+    )
+    parser.add_argument(
+        'details_file', 
+        nargs='?', 
+        default=INPUT_DETAILS_PATH,
+        help=f"Path to the itinerary details JSON file. Defaults to '{INPUT_DETAILS_PATH}'"
+    )
+    args = parser.parse_args()
+
+    current_config_json_path = args.config_file
+    current_details_json_path = args.details_file
+    
+    print(f"Using config file: {current_config_json_path}")
+    print(f"Using details file: {current_details_json_path}")
+
     # Load Config Data
     try:
-        with open(INPUT_JSON_PATH, 'r') as f:
+        with open(current_config_json_path, 'r') as f:
             config_data = json.load(f)
-        print(f"Successfully loaded config data from: {INPUT_JSON_PATH}")
+        print(f"Successfully loaded config data from: {current_config_json_path}")
     except FileNotFoundError:
-        print(f"Error: Config JSON file not found at '{INPUT_JSON_PATH}'")
+        print(f"Error: Config JSON file not found at '{current_config_json_path}'")
         sys.exit(1)
     except json.JSONDecodeError as e:
-        print(f"Error parsing config JSON file '{INPUT_JSON_PATH}': {e}")
+        print(f"Error parsing config JSON file '{current_config_json_path}': {e}")
         sys.exit(1)
     except Exception as e:
         print(f"An unexpected error occurred loading config JSON: {e}")
@@ -105,14 +127,14 @@ def main():
 
     # Load Itinerary Details Data
     try:
-        with open(INPUT_DETAILS_PATH, 'r') as f:
+        with open(current_details_json_path, 'r') as f:
             details_data = json.load(f)
-        print(f"Successfully loaded itinerary details from: {INPUT_DETAILS_PATH}")
+        print(f"Successfully loaded itinerary details from: {current_details_json_path}")
     except FileNotFoundError:
-        print(f"Error: Itinerary details JSON file not found at '{INPUT_DETAILS_PATH}'")
+        print(f"Error: Itinerary details JSON file not found at '{current_details_json_path}'")
         sys.exit(1)
     except json.JSONDecodeError as e:
-        print(f"Error parsing details JSON file '{INPUT_DETAILS_PATH}': {e}")
+        print(f"Error parsing details JSON file '{current_details_json_path}': {e}")
         sys.exit(1)
     except Exception as e:
         print(f"An unexpected error occurred loading details JSON: {e}")
@@ -123,7 +145,7 @@ def main():
         page1_config = config_data["page1_config"]
         daywise_config = config_data["daywise_config"]
     except KeyError as e:
-        print(f"Error: Missing required config key in JSON ({INPUT_JSON_PATH}): {e}")
+        print(f"Error: Missing required config key in JSON ({current_config_json_path}): {e}")
         print("Ensure 'page1_config' and 'daywise_config' exist.")
         sys.exit(1)
         
@@ -137,7 +159,7 @@ def main():
         quote = itinerary_details.get("quote", DEFAULT_QUOTE)
         terms_conditions = itinerary_details.get("terms_and_conditions", DEFAULT_TERMS_CONDITIONS) # Added terms extraction
     except KeyError as e:
-        print(f"Error: Missing required 'itinerary_details' key in JSON ({INPUT_DETAILS_PATH}): {e}")
+        print(f"Error: Missing required 'itinerary_details' key in JSON ({current_details_json_path}): {e}")
         sys.exit(1)
 
     page1_text_overrides = itinerary_details.get("page1_text")
