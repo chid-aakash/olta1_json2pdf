@@ -1,9 +1,13 @@
 import json
 import os
 import sys
-from PIL import Image, ImageDraw, ImageFont
+import shutil
+from PIL import Image, ImageDraw, ImageFont, ImageFilter
 import glob
 import argparse
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.utils import ImageReader
 
 INPUT_JSON_PATH = "inputs/itinerary_data.json"
 INPUT_DETAILS_PATH = "inputs/itinerary_details.json"
@@ -103,6 +107,13 @@ def main():
         help=f"Path to the itinerary details JSON file. Defaults to '{INPUT_DETAILS_PATH}'"
     )
     args = parser.parse_args()
+
+    # --- Start: Clear and recreate outputs directory ---
+    print(f"Clearing and recreating output directory: {OUTPUTS_BASE_DIR}")
+    if os.path.exists(OUTPUTS_BASE_DIR):
+        shutil.rmtree(OUTPUTS_BASE_DIR)
+    os.makedirs(OUTPUTS_BASE_DIR)
+    # --- End: Clear and recreate outputs directory ---
 
     current_config_json_path = args.config_file
     current_details_json_path = args.details_file
