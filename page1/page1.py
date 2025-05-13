@@ -1,5 +1,5 @@
 # v3 Refactored Page 1 Generator
-from PIL import Image, ImageDraw, ImageFont, ImageOps
+from PIL import Image, ImageDraw, ImageFont, ImageOps, ImageFilter
 import os
 import urllib.request
 import ssl
@@ -24,10 +24,10 @@ DEFAULT_CONFIG = {
         "name": "Client Name"
     },
     "fonts": {
-        "title_size": 220,
-        "dates_size": 85,
-        "prep_size": 85,
-        "name_size": 150
+        "title_size": 330,
+        "dates_size": 125,
+        "prep_size": 120,
+        "name_size": 225
     },
     "layout": {
         "text_start_y": 200,
@@ -43,8 +43,8 @@ DEFAULT_CONFIG = {
         "logo_opacity": 0.70,
         "overlay_color": (0, 0, 0, 80),
         "text_fill": "white",
-        "text_shadow_color": "grey",
-        "text_shadow_offset": (3, 3),
+        "text_shadow_color": "#333333",
+        "text_shadow_offset": (4, 4),
         "jpeg_quality": 95
     }
 }
@@ -179,6 +179,9 @@ def generate_page1(output_filename: str, config_data: dict):
     if not bg:
         print(f"Failed to load background image: {page1_bg_path}")
         return
+
+    # Apply Gaussian Blur to the background
+    bg = bg.filter(ImageFilter.GaussianBlur(radius=5)) # Adjust radius as needed
 
     bg = bg.convert('RGBA')
 

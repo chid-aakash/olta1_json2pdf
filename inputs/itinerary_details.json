@@ -98,7 +98,7 @@
       "Personal expenses (laundry, phone calls, tips, etc.)",
       "Travel Insurance (highly recommended)",
       "Optional activities or excursions not mentioned",
-      "Early check-in or late check-out charges",
+      "Early checkin or late checkout charges",
       "Anything not explicitly mentioned in the 'Inclusions' section"
     ],
     "hotel_details": [
@@ -110,7 +110,7 @@
         "email_id": "info.nusadua@themulia.com",
         "check_in_time": "15th June 3pm",
         "check_out_time": "18th June 12pm",
-        "amenities": ["Oceanfront Pools", "Spa", "Fitness Center", "Multiple Restaurants", "Beach Access"]
+        "amenities": ["Oceanfront Pools", "Wifi", "Fitness Center", "Multiple Restaurants", "Beach Access", "Water Sports"]
       }
     ],
     "quote": {

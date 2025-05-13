@@ -65,7 +65,7 @@ DEFAULT_HOTEL_DETAILS = [{
     "email_id": "N/A", 
     "check_in_time": "14:00", 
     "check_out_time": "12:00", 
-    "amenities": ["Specify in itinerary_details.json"]
+    "amenities": ["Oceanfront Pools", "Fitness Center", "Multiple Restaurants", "Hiking", "Water Sports", "Wifi"]
 }]
 # Updated default quote structure
 DEFAULT_QUOTE = {
@@ -257,7 +257,6 @@ def main():
     try:
         generate_quote_page(
             output_filename=quote_filename_base,
-            font_path=FONT_PATH,
             base_output_dir=OUTPUTS_BASE_DIR,
             quote=quote,                 # Pass relevant data
             terms_conditions=terms_conditions # Pass relevant data

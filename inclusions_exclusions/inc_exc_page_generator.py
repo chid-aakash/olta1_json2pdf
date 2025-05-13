@@ -9,7 +9,7 @@ WIDTH = 2480 # Standard A4 width @ 300 DPI
 HEIGHT = 3508
 
 PAGE_BG_COLOR = "#1F1F1F" # Dark background for the page
-CARD_MARGIN = 60       # Margin around the central card
+CARD_MARGIN = 90       # Increased from 60 to significantly reduce card height
 CARD_RADIUS = 40       # Corner radius for the card
 CARD_BG_COLOR = "#F0F0F0" # Light background for the card itself (subtle)
 
@@ -39,12 +39,14 @@ TEXT_NOT_INCLUDED = "What's Not Included ✕"
 
 # Layout constants (relative to card or half-card)
 TITLE_FONT_SIZE = 80 # Adjust as needed
-TITLE_TOP_MARGIN = 150 # Top margin *within* the card half
+TITLE_TOP_MARGIN = 130 # Reduced from 150 to move title block up
 LINE_START_Y_OFFSET = 400 # Y offset for first line *within* the card half
 LINE_SPACING = 80 # Adjust spacing between lines
 LINE_LENGTH = 400 # Adjust length of placeholder lines (relative to half-card width)
 LINE_THICKNESS = 4 # Adjust thickness of lines
-CARD_BLUR_RADIUS = 20 # Blur radius for the frosted glass effect
+CARD_BLUR_RADIUS = 45 # Increased from 20 for more pronounced blur
+TEXT_SHADOW_COLOR = (0, 0, 0, 128)  # Shadow for white text
+TEXT_SHADOW_OFFSET = (3, 3)         # Shadow offset
 
 # New constants for items
 ITEM_FONT_SIZE = 90 # Increased font size further
@@ -60,10 +62,12 @@ FONT_PATH_PLAYFAIR = 'fonts/PlayfairDisplay-VariableFont_wght.ttf'
 FONT_PATH_ITEM = 'fonts/Chalkboard-Regular.ttf' # Updated to use Chalkboard
 
 # Icon paths (assuming they are in an 'icons' folder)
-ICON_PATH_TICK = 'icons/tick.webp' # Updated to use webp
+ICON_PATH_TICK = 'icons/tick.webp' 
 ICON_PATH_CROSS = 'icons/cross.png'
-ICON_SIZE = 65 # Slightly reduced icon size relative to title font
-TITLE_ICON_SPACING = 20 # Adjusted space between icon and title text
+ICON_SIZE = 100 # Reduced from 200, was 80 before user change
+TITLE_ICON_SPACING = 25 
+# HEADER_BAND_COLOR = (0, 0, 0, 0) # Removed, header band will not be drawn separately
+MAX_ITEM_LINES = 3 
 
 def create_gradient(width, height, start_color, end_alpha=0.0):
     """Creates a vertical linear gradient image."""
@@ -180,10 +184,23 @@ def generate_inc_exc_page(
     mask_draw.rounded_rectangle([0, 0, CARD_WIDTH, CARD_HEIGHT], radius=CARD_RADIUS, fill=255)
 
     # 4. Paste the blurred background onto the main image using the mask
-    # Ensure blurred_crop is RGBA if img is RGBA
     if blurred_crop.mode != 'RGBA' and img.mode == 'RGBA':
         blurred_crop = blurred_crop.convert('RGBA')
-    img.paste(blurred_crop, (CARD_X0, CARD_Y0), mask)
+    
+    # Create a light, semi-transparent overlay for the card area
+    card_overlay = Image.new('RGBA', (CARD_WIDTH, CARD_HEIGHT), (240, 240, 240, 95)) # Alpha reduced to 140 (from 170)
+    
+    # Composite the light overlay onto the blurred crop
+    if blurred_crop.mode != 'RGBA':
+        blurred_crop = blurred_crop.convert('RGBA') 
+    
+    # Create a temporary image for the card face by pasting blurred_crop, then overlay
+    card_face = Image.new('RGBA', (CARD_WIDTH, CARD_HEIGHT))
+    card_face.paste(blurred_crop, (0,0)) 
+    card_face = Image.alpha_composite(card_face, card_overlay)
+
+    # Paste the final card_face (blurred_crop + light_overlay) onto the main image using the mask
+    img.paste(card_face, (CARD_X0, CARD_Y0), mask)
 
     # --- Optional: Add a subtle border like in the hotel page ---
     draw = ImageDraw.Draw(img) # Re-initialize draw on the main image
@@ -201,14 +218,36 @@ def generate_inc_exc_page(
 
     # --- Content Drawing Area (Centered within the card coordinates) ---
     content_x_start = CARD_X0 # Start at the card's left edge on the page
-    # content_y_start = CARD_Y0 + TITLE_TOP_MARGIN # Top margin from card's top edge (title only)
     content_width = CARD_WIDTH # Use full card width
-    column_width = (content_width // 2) - COLUMN_PADDING # Width available for text in each column
+    column_width = (content_width // 2) - COLUMN_PADDING 
     left_col_x_start = content_x_start + COLUMN_PADDING
     right_col_x_start = content_x_start + (content_width // 2) + COLUMN_PADDING
 
+    # --- Calculate Title Heights for Header Band (now just for layout reference) ---
+    try:
+        bbox_incl_header = draw.textbbox((0, 0), TEXT_INCLUDED.replace(" ✓", "").strip(), font=font_title)
+        title_text_height = bbox_incl_header[3] - bbox_incl_header[1]
+    except AttributeError:
+        _, title_text_height = draw.textsize(TEXT_INCLUDED.replace(" ✓", "").strip(), font=font_title)
+    
+    # header_band_height = title_text_height + 40 
+    # header_band_y0 = CARD_Y0 + TITLE_TOP_MARGIN - 20 
+    # header_band_y1 = header_band_y0 + header_band_height
+
+    # # Draw header bands (subtle dark overlay behind titles) -> REMOVED
+    # # Left Header Band
+    # draw.rectangle(
+    #     (CARD_X0, header_band_y0, CARD_MID_X, header_band_y1),
+    #     fill=HEADER_BAND_COLOR
+    # )
+    # # Right Header Band
+    # draw.rectangle(
+    #     (CARD_MID_X, header_band_y0, CARD_X1, header_band_y1),
+    #     fill=HEADER_BAND_COLOR
+    # )
+
     # --- Left Column Title (Included) --- 
-    text_included_only = TEXT_INCLUDED.replace(" ✓", "").strip() # Remove checkmark text
+    text_included_only = TEXT_INCLUDED.replace(" ✓", "").strip()
     try:
         bbox_incl = draw.textbbox((0, 0), text_included_only, font=font_title)
         text_width_incl = bbox_incl[2] - bbox_incl[0]
@@ -222,13 +261,25 @@ def generate_inc_exc_page(
     title_y_incl = CARD_Y0 + TITLE_TOP_MARGIN
 
     # Draw Icon (if available)
-    icon_y_incl = title_y_incl + (text_height_incl - ICON_SIZE) // 2 # Vertically center icon with text
+    icon_y_offset_manual = 25 # Pixels to bump icon down relative to text center alignment
+    icon_y_incl = title_y_incl + (text_height_incl - ICON_SIZE) // 2 + icon_y_offset_manual
     current_x_incl = title_x_start_incl
     if tick_icon:
-        img.paste(tick_icon, (int(current_x_incl), int(icon_y_incl)), tick_icon) # Use main img.paste
+        # Ensure tick_icon is RGBA if img is RGBA, for proper alpha blending with shadow
+        if tick_icon.mode != 'RGBA' and img.mode == 'RGBA':
+            tick_icon = tick_icon.convert('RGBA')
+        img.paste(tick_icon, (int(current_x_incl), int(icon_y_incl)), tick_icon) 
         current_x_incl += ICON_SIZE + TITLE_ICON_SPACING
 
-    # Draw Text
+    # Draw Text (with shadow)
+    # Shadow for title
+    draw.text(
+        (current_x_incl + TEXT_SHADOW_OFFSET[0], title_y_incl + TEXT_SHADOW_OFFSET[1]),
+        text_included_only, 
+        fill=TEXT_SHADOW_COLOR, 
+        font=font_title
+    )
+    # Main title text
     draw.text((current_x_incl, title_y_incl), text_included_only, fill=COLOR_CHARCOAL_TEXT, font=font_title)
 
     # --- Right Column Title (Not Included) --- 
@@ -243,16 +294,28 @@ def generate_inc_exc_page(
     # Calculate combined width (icon + space + text)
     combined_width_excl = ICON_SIZE + TITLE_ICON_SPACING + text_width_excl if cross_icon else text_width_excl
     title_x_start_excl = right_col_x_start + (column_width - combined_width_excl) // 2 # Center combined element
-    title_y_excl = CARD_Y0 + TITLE_TOP_MARGIN # Align vertically with the other title
+    title_y_excl = CARD_Y0 + TITLE_TOP_MARGIN
 
     # Draw Icon (if available)
-    icon_y_excl = title_y_excl + (text_height_excl - ICON_SIZE) // 2 # Vertically center icon with text
+    icon_y_offset_manual = 35 # Pixels to bump icon down relative to text center alignment
+    icon_y_excl = title_y_excl + (text_height_excl - ICON_SIZE) // 2 + icon_y_offset_manual
     current_x_excl = title_x_start_excl
     if cross_icon:
-        img.paste(cross_icon, (int(current_x_excl), int(icon_y_excl)), cross_icon) # Use main img.paste
+        # Ensure cross_icon is RGBA if img is RGBA
+        if cross_icon.mode != 'RGBA' and img.mode == 'RGBA':
+            cross_icon = cross_icon.convert('RGBA')
+        img.paste(cross_icon, (int(current_x_excl), int(icon_y_excl)), cross_icon)
         current_x_excl += ICON_SIZE + TITLE_ICON_SPACING
-
-    # Draw Text
+    
+    # Draw Text (with shadow)
+    # Shadow for title
+    draw.text(
+        (current_x_excl + TEXT_SHADOW_OFFSET[0], title_y_excl + TEXT_SHADOW_OFFSET[1]),
+        text_excluded_only, 
+        fill=TEXT_SHADOW_COLOR, 
+        font=font_title
+    )
+    # Main title text
     draw.text((current_x_excl, title_y_excl), text_excluded_only, fill=COLOR_CHARCOAL_TEXT, font=font_title)
 
     # --- Draw Vertical Divider --- 
@@ -264,65 +327,115 @@ def generate_inc_exc_page(
               fill=DIVIDER_COLOR, width=DIVIDER_THICKNESS)
 
     # --- Draw Inclusion Items (Left Column) --- 
-    current_y = divider_y_start + 50 # Adjusted starting Y further down
-    # Re-calculate wrap width based on new list icon size and padding
-    available_text_width = column_width - LIST_ICON_SIZE - LIST_ICON_TEXT_SPACING - COLUMN_PADDING # Usable width for item text
+    # current_y = header_band_y1 + 40 # Start items below header band + padding
+    # Titles are at CARD_Y0 + TITLE_TOP_MARGIN. Start items below that.
+    current_y = CARD_Y0 + TITLE_TOP_MARGIN + title_text_height + 300 # Increased gap from 60 to 100
+    available_text_width = column_width - LIST_ICON_SIZE - LIST_ICON_TEXT_SPACING - COLUMN_PADDING 
     
     # Estimate wrap width (adjust multiplier as needed for Chalkboard font)
-    avg_char_width_est = font_item.size * 0.5 # Rough estimate for average char width
-    wrap_width_chars = 45 # Default fallback, adjust based on observation
-    if avg_char_width_est > 0:
-        wrap_width_chars = max(10, int(available_text_width / avg_char_width_est)) # Ensure minimum wrap width
+    # avg_char_width_est = font_item.size * 0.35 # Reduced multiplier from 0.5
+    wrap_width_chars = 25 # Directly set for more text per line
+    # if avg_char_width_est > 0:
+    #     wrap_width_chars = max(25, int(available_text_width / avg_char_width_est)) # Ensure minimum wrap width, increased min
     print(f"Left Column: Item Font Size={ITEM_FONT_SIZE}, Available Width={available_text_width}, Est Wrap Chars={wrap_width_chars}")
 
     for item in inclusions_list:
         lines = textwrap.wrap(item, width=wrap_width_chars)
         if lines:
-            # Calculate Y pos for the icon to roughly center it with the first line of text
-            first_line_height_approx = font_item.size # Approximate height
+            # Truncate lines if more than MAX_ITEM_LINES
+            if len(lines) > MAX_ITEM_LINES:
+                lines = lines[:MAX_ITEM_LINES]
+                if len(lines[-1]) > 3: # Ensure there's space for ellipsis
+                    lines[-1] = lines[-1][:-3] + "..."
+                else:
+                    lines[-1] = "..." # If last line is too short, just use ellipsis
+            
+            first_line_height_approx = font_item.size 
             icon_y = current_y + (first_line_height_approx - LIST_ICON_SIZE) // 2
             # Draw list tick icon
             if list_tick_icon:
+                 # Ensure icon is RGBA if main image is
+                 if list_tick_icon.mode != 'RGBA' and img.mode == 'RGBA':
+                     list_tick_icon = list_tick_icon.convert('RGBA')
                  img.paste(list_tick_icon, (left_col_x_start, int(icon_y)), list_tick_icon)
             
             # Calculate text start position
             text_x = left_col_x_start + LIST_ICON_SIZE + LIST_ICON_TEXT_SPACING
             
-            # Draw first line of text
+            # Draw first line of text (with shadow)
+            draw.text(
+                (text_x + TEXT_SHADOW_OFFSET[0], current_y + TEXT_SHADOW_OFFSET[1]),
+                lines[0], 
+                fill=TEXT_SHADOW_COLOR, 
+                font=font_item
+            )
             draw.text((text_x, current_y), lines[0], fill=COLOR_CHARCOAL_TEXT, font=font_item)
-            current_y += ITEM_LINE_SPACING # Move y for next *potential* line/item
-            # Draw subsequent wrapped lines (indented to align with first line text)
-            for line in lines[1:]:
+            current_y += ITEM_LINE_SPACING 
+            # Draw subsequent wrapped lines (indented to align with first line text, with shadow)
+            for line_idx, line in enumerate(lines[1:]):
+                # Shadow for wrapped line
+                draw.text(
+                    (text_x + TEXT_SHADOW_OFFSET[0], current_y + TEXT_SHADOW_OFFSET[1]),
+                    line, 
+                    fill=TEXT_SHADOW_COLOR, 
+                    font=font_item
+                )
                 draw.text((text_x, current_y), line, fill=COLOR_CHARCOAL_TEXT, font=font_item)
-                current_y += ITEM_LINE_SPACING # Move y down for each wrapped line
+                current_y += ITEM_LINE_SPACING 
         else: # Handle empty items?
             current_y += ITEM_LINE_SPACING
         # No extra space between items to maximize vertical fill
 
     # --- Draw Exclusion Items (Right Column) --- 
-    current_y = divider_y_start + 50 # Reset Y to start top-aligned with inclusions, adjusted further down
-    # Re-calculate wrap width (should be same as left column calculation)
+    # current_y = header_band_y1 + 40 # Reset Y to start below header band + padding
+    current_y = CARD_Y0 + TITLE_TOP_MARGIN + title_text_height + 300 # Reset Y, Increased gap from 60 to 100
     available_text_width = column_width - LIST_ICON_SIZE - LIST_ICON_TEXT_SPACING - COLUMN_PADDING
-    avg_char_width_est = font_item.size * 0.5 
-    wrap_width_chars = 45 # Default fallback 
-    if avg_char_width_est > 0:
-        wrap_width_chars = max(10, int(available_text_width / avg_char_width_est))
+    # avg_char_width_est = font_item.size * 0.35 # Reduced multiplier from 0.5
+    wrap_width_chars = 25 # Directly set for more text per line
+    # if avg_char_width_est > 0:
+    #     wrap_width_chars = max(25, int(available_text_width / avg_char_width_est))
     print(f"Right Column: Item Font Size={ITEM_FONT_SIZE}, Available Width={available_text_width}, Est Wrap Chars={wrap_width_chars}")
 
     for item in exclusions_list:
         lines = textwrap.wrap(item, width=wrap_width_chars)
         if lines:
+            # Truncate lines if more than MAX_ITEM_LINES
+            if len(lines) > MAX_ITEM_LINES:
+                lines = lines[:MAX_ITEM_LINES]
+                if len(lines[-1]) > 3:
+                    lines[-1] = lines[-1][:-3] + "..."
+                else:
+                    lines[-1] = "..."
+
             first_line_height_approx = font_item.size
             icon_y = current_y + (first_line_height_approx - LIST_ICON_SIZE) // 2
             # Draw list cross icon
             if list_cross_icon:
+                 # Ensure icon is RGBA if main image is
+                 if list_cross_icon.mode != 'RGBA' and img.mode == 'RGBA':
+                     list_cross_icon = list_cross_icon.convert('RGBA')
                  img.paste(list_cross_icon, (right_col_x_start, int(icon_y)), list_cross_icon)
             
             text_x = right_col_x_start + LIST_ICON_SIZE + LIST_ICON_TEXT_SPACING
             
+            # Draw first line of text (with shadow)
+            draw.text(
+                (text_x + TEXT_SHADOW_OFFSET[0], current_y + TEXT_SHADOW_OFFSET[1]),
+                lines[0], 
+                fill=TEXT_SHADOW_COLOR, 
+                font=font_item
+            )
             draw.text((text_x, current_y), lines[0], fill=COLOR_CHARCOAL_TEXT, font=font_item)
             current_y += ITEM_LINE_SPACING
-            for line in lines[1:]:
+            # Draw subsequent wrapped lines (with shadow)
+            for line_idx, line in enumerate(lines[1:]):
+                # Shadow for wrapped line
+                draw.text(
+                    (text_x + TEXT_SHADOW_OFFSET[0], current_y + TEXT_SHADOW_OFFSET[1]),
+                    line, 
+                    fill=TEXT_SHADOW_COLOR, 
+                    font=font_item
+                )
                 draw.text((text_x, current_y), line, fill=COLOR_CHARCOAL_TEXT, font=font_item)
                 current_y += ITEM_LINE_SPACING
         else:

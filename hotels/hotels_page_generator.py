@@ -4,7 +4,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageEnhance
 import textwrap # Import textwrap for potential long lines
 
 # Import card drawing functions (Updated)
-from .card_drawing import draw_main_info_card, draw_checkin_card
+from .card_drawing import draw_main_info_card, draw_checkin_card, draw_amenities_card
 
 # --- Constants ---
 A4_WIDTH_MM = 210
@@ -17,7 +17,7 @@ PAGE_HEIGHT_PX = int(A4_HEIGHT_MM * MM_TO_INCH * DPI) # Approx 3508
 SAFE_MARGIN_MM = 15
 SAFE_MARGIN_PX = int(SAFE_MARGIN_MM * MM_TO_INCH * DPI) # Approx 177
 
-TEXT_DARK = (33, 33, 33) # #212121
+TEXT_DARK = (0, 0, 0) # Changed from (33,33,33) to make it pop more
 TEXT_LIGHT = (255, 255, 255) # #FFFFFF
 
 # Font paths (assuming they are accessible)
@@ -117,29 +117,28 @@ def generate_hotels_page(output_filename: str, base_output_dir: str, hotel_detai
     fonts = {}
     # Moved font loading here, after potentially exiting early if hero fails
     try:
-        # Increased font sizes (approx 10-15%)
-        fonts['playfair_huge'] = ImageFont.truetype(FONT_PATH_PLAYFAIR, 270) # HUGE name font (Increased size)
-        fonts['playfair_regular'] = ImageFont.truetype(FONT_PATH_PLAYFAIR, 70) # Increased size
-        fonts['playfair_italic'] = ImageFont.truetype(FONT_PATH_PLAYFAIR_ITALIC, 70) # Increased size
-        fonts['inter_star'] = ImageFont.truetype(FONT_PATH_INTER, 42) # Increased size
-        fonts['inter_body'] = ImageFont.truetype(FONT_PATH_INTER, 42)     # Increased size
-        fonts['inter_large_detail'] = ImageFont.truetype(FONT_PATH_INTER, 70) # Increased size
-        fonts['inter_xl_detail'] = ImageFont.truetype(FONT_PATH_INTER, 90)    # Increased size
-        fonts['inter_small'] = ImageFont.truetype(FONT_PATH_INTER, 32)    # Increased size
-        fonts['inter_label'] = ImageFont.truetype(FONT_PATH_INTER, 36)    # Increased size
-        # We might need more variations later (bold, etc.)
+        # Significantly increased font sizes (~50% from user's last baseline)
+        fonts['playfair_huge'] = ImageFont.truetype(FONT_PATH_PLAYFAIR, 100) 
+        fonts['playfair_regular'] = ImageFont.truetype(FONT_PATH_PLAYFAIR, 50)
+        fonts['playfair_italic'] = ImageFont.truetype(FONT_PATH_PLAYFAIR_ITALIC, 50)
+        fonts['inter_star'] = ImageFont.truetype(FONT_PATH_INTER, 30)      
+        fonts['inter_body'] = ImageFont.truetype(FONT_PATH_INTER, 30)      
+        fonts['inter_large_detail'] = ImageFont.truetype(FONT_PATH_INTER, 30) # For address/phone
+        fonts['inter_xl_detail'] = ImageFont.truetype(FONT_PATH_INTER, 135)    # For checkin/out dates
+        fonts['inter_small'] = ImageFont.truetype(FONT_PATH_INTER, 48)     
+        fonts['inter_label'] = ImageFont.truetype(FONT_PATH_INTER, 54)     # For amenities, checkin/out labels
     except IOError as e:
         print(f"Warning: One or more font files not found ({e}). Using default fonts.")
-        # Fallback to default fonts - Increased sizes here too
-        fonts['playfair_huge'] = ImageFont.load_default(size=270) # Increased fallback size
-        fonts['playfair_regular'] = ImageFont.load_default(size=70)
-        fonts['playfair_italic'] = ImageFont.load_default(size=70)
-        fonts['inter_star'] = ImageFont.load_default(size=42)
-        fonts['inter_body'] = ImageFont.load_default(size=42)
-        fonts['inter_large_detail'] = ImageFont.load_default(size=70) # Large detail font fallback
-        fonts['inter_xl_detail'] = ImageFont.load_default(size=90)    # XL detail font fallback
-        fonts['inter_small'] = ImageFont.load_default(size=32)
-        fonts['inter_label'] = ImageFont.load_default(size=36)
+        # Fallback to default fonts - Also significantly increased
+        fonts['playfair_huge'] = ImageFont.load_default(size=200)
+        fonts['playfair_regular'] = ImageFont.load_default(size=100)
+        fonts['playfair_italic'] = ImageFont.load_default(size=110)
+        fonts['inter_star'] = ImageFont.load_default(size=50)
+        fonts['inter_body'] = ImageFont.load_default(size=20)
+        fonts['inter_large_detail'] = ImageFont.load_default(size=50)
+        fonts['inter_xl_detail'] = ImageFont.load_default(size=90)
+        fonts['inter_small'] = ImageFont.load_default(size=50)
+        fonts['inter_label'] = ImageFont.load_default(size=55)
 
 
     # --- Initialize Draw context ---
@@ -159,6 +158,7 @@ def generate_hotels_page(output_filename: str, base_output_dir: str, hotel_detai
 
     if hotel_info_to_draw:
         card1_bounding_box = None # Initialize
+        checkin_card_bounding_box = None # Initialize for amenities card positioning
         try:
             # Call the main info card function and get its box
             card1_bounding_box = draw_main_info_card(img, hotel_info_to_draw, fonts, page_dims)
@@ -170,12 +170,27 @@ def generate_hotels_page(output_filename: str, base_output_dir: str, hotel_detai
             print("Attempting to draw Checkin Card...") # DEBUG PRINT
             try:
                  # Call the check-in card function, passing card 1's box
-                draw_checkin_card(img, hotel_info_to_draw, fonts, page_dims, card1_bounding_box)
+                checkin_card_bounding_box = draw_checkin_card(img, hotel_info_to_draw, fonts, page_dims, card1_bounding_box)
                 print("Call to draw_checkin_card completed.") # DEBUG PRINT
             except Exception as e:
                 print(f"Error drawing Checkin card: {e}")
         else:
              print("Skipping Checkin card because Main Info card failed or was skipped.") # DEBUG PRINT
+
+        # --- Layer 4: Amenities Card --- # Added new layer
+        if checkin_card_bounding_box: # Only draw if check-in card was drawn successfully
+            amenities = hotel_info_to_draw.get("amenities", [])
+            if amenities:
+                print("Attempting to draw Amenities Card...")
+                try:
+                    draw_amenities_card(img, amenities, fonts, page_dims, checkin_card_bounding_box)
+                    print("Call to draw_amenities_card completed.")
+                except Exception as e:
+                    print(f"Error drawing Amenities card: {e}")
+            else:
+                print("No amenities found for this hotel. Skipping amenities card.")
+        else:
+            print("Skipping Amenities card because Check-in card failed or was skipped.")
     else:
         print("Warning: No valid hotel details found to draw cards.")
 
@@ -221,7 +236,7 @@ if __name__ == '__main__':
         "email_id": "reservations@oberoibali.com",
         "check_in_time": "14 Jun 15:00", # Combined for example card 2 later
         "check_out_time": "18 Jun 12:00", # Combined for example card 2 later
-        "amenities": ["Wi-Fi", "Restaurant", "Spa", "Gym", "Kids Club", "Parking"] # Example
+        "amenities": ["Oceanfront Pools", "Fitness Center", "Multiple Restaurants", "Hiking", "Water Sports", "Wifi"]
     }
 
     generate_hotels_page(
